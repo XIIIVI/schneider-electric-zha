@@ -1,0 +1,65 @@
+blueprint:
+  name: "Schneider FLS/AIRLINK/4 — Single Rocker"
+  description: >
+    Triggers one configurable action for a single rocker.
+    Uses endpoint 21 by default and matches ON/OFF press events.
+    Ignores attribute_updated noise by requiring args: [].
+  domain: automation
+  input:
+    zha_device:
+      name: "Schneider FLS/AIRLINK/4 device"
+      selector:
+        device:
+          integration: zha
+          model: FLS/AIRLINK/4
+
+    endpoint:
+      name: "Endpoint"
+      description: "ZHA endpoint ID for this rocker (default 21)"
+      default: 21
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    rocker_action:
+      name: "Action to run"
+      selector:
+        action:
+
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: on
+
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: off
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: on
+        sequence: !input rocker_action
+
+      - conditions:
+          - condition: trigger
+            id: off
+        sequence: !input rocker_action
+
+mode: queued
+max: 10

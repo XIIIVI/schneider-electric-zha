@@ -1,0 +1,125 @@
+blueprint:
+  name: "Schneider FLS/AIRLINK/4 — 4 Rockers (2 endpoints × on/off)"
+  description: >
+    Runs 4 independent actions using 2 ZHA endpoints (21 and 22).
+    Each endpoint emits command:on and command:off, giving 4 distinct
+    rocker cases. Ignores attribute_updated events by requiring args: [].
+    Requires the device to be in 4-rocker mode (see README).
+  domain: automation
+  input:
+    zha_device:
+      name: "Schneider FLS/AIRLINK/4 device"
+      selector:
+        device:
+          integration: zha
+          model: FLS/AIRLINK/4
+
+    endpoint_1:
+      name: "Endpoint 1 (rockers 1 & 2)"
+      description: "ZHA endpoint for the first rocker pair (default 21)"
+      default: 21
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    action_1_on:
+      name: "Action — Endpoint 1 ON"
+      selector:
+        action:
+
+    action_1_off:
+      name: "Action — Endpoint 1 OFF"
+      selector:
+        action:
+
+    endpoint_2:
+      name: "Endpoint 2 (rockers 3 & 4)"
+      description: "ZHA endpoint for the second rocker pair (default 22)"
+      default: 22
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    action_2_on:
+      name: "Action — Endpoint 2 ON"
+      selector:
+        action:
+
+    action_2_off:
+      name: "Action — Endpoint 2 OFF"
+      selector:
+        action:
+
+trigger:
+  # Endpoint 1 — ON
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: ep1_on
+
+  # Endpoint 1 — OFF
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: ep1_off
+
+  # Endpoint 2 — ON
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: ep2_on
+
+  # Endpoint 2 — OFF
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: ep2_off
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: ep1_on
+        sequence: !input action_1_on
+
+      - conditions:
+          - condition: trigger
+            id: ep1_off
+        sequence: !input action_1_off
+
+      - conditions:
+          - condition: trigger
+            id: ep2_on
+        sequence: !input action_2_on
+
+      - conditions:
+          - condition: trigger
+            id: ep2_off
+        sequence: !input action_2_off
+
+mode: queued
+max: 10
