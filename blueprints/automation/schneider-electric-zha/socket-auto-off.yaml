@@ -7,12 +7,18 @@ blueprint:
 
 
     Works with any socket reporting `SOCKET/OUTLET/1` or `SOCKET/OUTLET/2`
-    through ZHA. The trigger reads the socket's own power sensor, so it needs no
-    extra hardware.
+    through ZHA. Pick the socket and nothing else: the power sensor is found on
+    the device itself (the entity whose `device_class` is `power`), and the
+    switch-off targets the device, so renaming either entity cannot break the
+    automation.
 
 
-    The socket is turned off through the device, not through a hard-coded entity,
-    so the automation survives an entity being renamed.
+    A socket exposing several power sensors is switched off only once the
+    highest of them is below the threshold.
+
+
+    The automation never fires while the reading is `unavailable` or `unknown` —
+    a socket whose sensor dropped off the network stays on.
 
 
     Home Assistant's automation schema has no icon, label, area or category key,
@@ -37,21 +43,11 @@ blueprint:
             - integration: zha
               model: SOCKET/OUTLET/2
 
-    power_sensor:
-      name: "Power sensor of that socket"
-      description: >
-        The socket's own power sensor. Pick the one belonging to the device
-        selected above — that is what the threshold is measured on.
-      selector:
-        entity:
-          filter:
-            - integration: zha
-              domain: sensor
-              device_class: power
-
     power_threshold:
       name: "Power threshold"
-      description: "The socket is switched off once the measured power stays strictly below this value."
+      description: >
+        The socket is switched off once its power sensor stays strictly below
+        this value.
       default: 20
       selector:
         number:
@@ -96,10 +92,21 @@ blueprint:
             label:
               multiple: true
 
+trigger_variables:
+  socket_device: !input socket_device
+  power_threshold: !input power_threshold
+
 triggers:
-  - trigger: numeric_state
-    entity_id: !input power_sensor
-    below: !input power_threshold
+  # The socket's own power sensor, resolved from the device: no second input to
+  # keep in sync, and nothing breaks when the sensor is renamed.
+  - trigger: template
+    value_template: >
+      {% set readings = expand(device_entities(socket_device))
+           | selectattr('domain', 'eq', 'sensor')
+           | selectattr('attributes.device_class', 'defined')
+           | selectattr('attributes.device_class', 'eq', 'power')
+           | map(attribute='state') | select('is_number') | map('float') | list %}
+      {{ readings | count > 0 and (readings | max) < power_threshold }}
     for: !input below_for
 
 actions:
