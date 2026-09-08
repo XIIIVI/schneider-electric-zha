@@ -1,0 +1,238 @@
+blueprint:
+  name: "Schneider Electric ZHA — 4 rockers (2 endpoints × up/down)"
+  description: >
+    Runs four independent actions from the two endpoints of a Schneider Electric
+    Zigbee wall switch paired through ZHA. Each endpoint emits an up and a down
+    command, giving four distinct rocker cases.
+
+
+    Supports both device families:
+
+    - AIRLINK / FLS (`FLS/AIRLINK/4`) — rockers emit OnOff commands
+      (cluster 6: `on` / `off`). Requires the device to be in 4-rocker mode,
+      see the README.
+
+    - Wiser shutter switch (`NHPB/SHUTTER/1`, `1GANG/SHUTTER/1`) — rockers emit
+      Window Covering commands (cluster 258: `up_open` / `down_close`) on
+      endpoint 21 only, so only the first endpoint's two actions fire.
+
+
+    Attribute-update noise is ignored by requiring `args: []`.
+
+
+    The `install_area`, `install_labels` and `install_icon` variables are
+    available inside every action sequence, so an action can target the room or
+    the labels declared below, for example
+    `target: {area_id: "{{ install_area }}"}`.
+
+
+    Tags: schneider electric, zha
+  domain: automation
+  author: XIIIVI
+  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/four-rockers.yaml
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    zha_device:
+      name: "Schneider Electric ZHA device"
+      description: "AIRLINK/FLS switch or Wiser shutter switch, paired through ZHA."
+      selector:
+        device:
+          filter:
+            - integration: zha
+              model: FLS/AIRLINK/4
+            - integration: zha
+              model: NHPB/SHUTTER/1
+            - integration: zha
+              model: 1GANG/SHUTTER/1
+
+    endpoint_1:
+      name: "Endpoint 1 (rockers 1 & 2)"
+      description: "ZHA endpoint of the first rocker pair (21 on both families)."
+      default: 21
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    action_1_on:
+      name: "Action — endpoint 1 pressed up (ON)"
+      selector:
+        action:
+
+    action_1_off:
+      name: "Action — endpoint 1 pressed down (OFF)"
+      selector:
+        action:
+
+    endpoint_2:
+      name: "Endpoint 2 (rockers 3 & 4)"
+      description: "ZHA endpoint of the second rocker pair (22 on AIRLINK, unused on shutter switches)."
+      default: 22
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    action_2_on:
+      name: "Action — endpoint 2 pressed up (ON)"
+      selector:
+        action:
+
+    action_2_off:
+      name: "Action — endpoint 2 pressed down (OFF)"
+      selector:
+        action:
+
+    installation:
+      name: "Installation"
+      icon: mdi:tag-multiple
+      collapsed: true
+      input:
+        install_area:
+          name: "Installation room"
+          description: >
+            Room the switch is installed in, exposed to every action sequence as
+            the `install_area` variable.
+          default: []
+          selector:
+            area:
+              multiple: true
+
+        install_labels:
+          name: "Labels"
+          description: >
+            One or more labels, exposed to every action sequence as the
+            `install_labels` variable.
+          default: []
+          selector:
+            label:
+              multiple: true
+
+        install_icon:
+          name: "Icon"
+          description: >
+            Icon representing this switch. Home Assistant cannot set an
+            automation icon from YAML, so this value is only exposed as the
+            `install_icon` variable; set the real automation icon from the
+            automation's overflow menu.
+          default: mdi:light-switch
+          selector:
+            icon:
+
+variables:
+  install_area: !input install_area
+  install_labels: !input install_labels
+  install_icon: !input install_icon
+
+triggers:
+  # Endpoint 1 — ON (OnOff switch) / UP (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: ep1_on
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 258
+      command: up_open
+      args: []
+    id: ep1_on
+
+  # Endpoint 1 — OFF (OnOff switch) / DOWN (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: ep1_off
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_1
+      cluster_id: 258
+      command: down_close
+      args: []
+    id: ep1_off
+
+  # Endpoint 2 — ON (OnOff switch) / UP (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: ep2_on
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 258
+      command: up_open
+      args: []
+    id: ep2_on
+
+  # Endpoint 2 — OFF (OnOff switch) / DOWN (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: ep2_off
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_2
+      cluster_id: 258
+      command: down_close
+      args: []
+    id: ep2_off
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: ep1_on
+        sequence: !input action_1_on
+
+      - conditions:
+          - condition: trigger
+            id: ep1_off
+        sequence: !input action_1_off
+
+      - conditions:
+          - condition: trigger
+            id: ep2_on
+        sequence: !input action_2_on
+
+      - conditions:
+          - condition: trigger
+            id: ep2_off
+        sequence: !input action_2_off
+
+mode: queued
+max: 10

@@ -1,0 +1,164 @@
+blueprint:
+  name: "Schneider Electric ZHA — single rocker"
+  description: >
+    Runs one action when a rocker of a Schneider Electric Zigbee wall switch is
+    pressed up, and another one when it is pressed down.
+
+
+    Supports both device families:
+
+    - AIRLINK / FLS (`FLS/AIRLINK/4`) — rockers emit OnOff commands
+      (cluster 6: `on` / `off`).
+
+    - Wiser shutter switch (`NHPB/SHUTTER/1`, `1GANG/SHUTTER/1`) — rockers emit
+      Window Covering commands (cluster 258: `up_open` / `down_close`).
+      `up_open` is treated as ON, `down_close` as OFF.
+
+
+    Attribute-update noise is ignored by requiring `args: []`.
+
+
+    The `install_area`, `install_labels` and `install_icon` variables are
+    available inside both action sequences, so an action can target the room or
+    the labels declared below, for example
+    `target: {area_id: "{{ install_area }}"}`.
+
+
+    Tags: schneider electric, zha
+  domain: automation
+  author: XIIIVI
+  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/single-rocker.yaml
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    zha_device:
+      name: "Schneider Electric ZHA device"
+      description: "AIRLINK/FLS switch or Wiser shutter switch, paired through ZHA."
+      selector:
+        device:
+          filter:
+            - integration: zha
+              model: FLS/AIRLINK/4
+            - integration: zha
+              model: NHPB/SHUTTER/1
+            - integration: zha
+              model: 1GANG/SHUTTER/1
+
+    endpoint:
+      name: "Endpoint"
+      description: "ZHA endpoint of this rocker (21 on both families)."
+      default: 21
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    action_on:
+      name: "Action — rocker pressed up (ON)"
+      selector:
+        action:
+
+    action_off:
+      name: "Action — rocker pressed down (OFF)"
+      selector:
+        action:
+
+    installation:
+      name: "Installation"
+      icon: mdi:tag-multiple
+      collapsed: true
+      input:
+        install_area:
+          name: "Installation room"
+          description: >
+            Room the switch is installed in, exposed to both action sequences as
+            the `install_area` variable.
+          default: []
+          selector:
+            area:
+              multiple: true
+
+        install_labels:
+          name: "Labels"
+          description: >
+            One or more labels, exposed to both action sequences as the
+            `install_labels` variable.
+          default: []
+          selector:
+            label:
+              multiple: true
+
+        install_icon:
+          name: "Icon"
+          description: >
+            Icon representing this switch. Home Assistant cannot set an
+            automation icon from YAML, so this value is only exposed as the
+            `install_icon` variable; set the real automation icon from the
+            automation's overflow menu.
+          default: mdi:light-switch
+          selector:
+            icon:
+
+variables:
+  install_area: !input install_area
+  install_labels: !input install_labels
+  install_icon: !input install_icon
+
+triggers:
+  # ON (OnOff switch) / UP (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: "on"
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 258
+      command: up_open
+      args: []
+    id: "on"
+
+  # OFF (OnOff switch) / DOWN (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: "off"
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint
+      cluster_id: 258
+      command: down_close
+      args: []
+    id: "off"
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: "on"
+        sequence: !input action_on
+
+      - conditions:
+          - condition: trigger
+            id: "off"
+        sequence: !input action_off
+
+mode: queued
+max: 10
