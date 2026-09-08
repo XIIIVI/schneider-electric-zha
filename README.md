@@ -140,6 +140,40 @@ device again in ZHA. After a reset:
 2. Re-pair the device.
 3. Re-select the new device in each blueprint automation.
 
+## Roadmap
+
+Measured against a real installation carrying 11 Schneider sockets, here is what
+these blueprints already replace and what is still hand-written.
+
+### Covered today
+
+| Blueprint | Hardware it applies to | Hand-written automations it replaces |
+|---|---|---|
+| `single-rocker.yaml`, `dual-rocker.yaml`, `four-rockers.yaml` | AIRLINK/FLS and Wiser shutter switches | 3 migrated so far |
+| `socket-auto-off.yaml` | Every socket exposing a `power` sensor — 11 of them, not the 4 that motivated it | 4 |
+
+Each Schneider socket exposes a *Demande instantanée* sensor
+(`device_class: power`, W) next to its current, voltage and energy sensors, so
+`socket-auto-off.yaml` needs nothing but the socket itself on any of them.
+
+### Candidates, not written yet
+
+| Blueprint | What it would do | Hand-written instances seen |
+|---|---|---|
+| Periodic socket restart | Power-cycle a socket on a schedule — a router, a always-on appliance | 2 |
+| Scheduled socket on/off | Switch a socket on at one time and off at another, optionally seasonal | 4 |
+| Presence-driven socket | Cut a socket while a person is away, restore it on return | 2 |
+
+Each is a single trigger and a single action away from the shape already used
+here, and each would apply to all 11 sockets rather than the two or four that
+motivate it.
+
+### Out of scope
+
+Heating, gates and garage doors, locks, alarm and holiday scenarios are the
+other families worth turning into blueprints in a typical installation — but
+none of them is Schneider ZHA hardware, so none belongs in this repository.
+
 ## Official documentation
 
 ### Home Assistant
