@@ -8,7 +8,7 @@ blueprint:
 
     Works with any socket reporting `SOCKET/OUTLET/1` or `SOCKET/OUTLET/2`
     through ZHA. Pick the socket and nothing else: the power sensor is found on
-    the device itself (its `power` entity — "Demande instantanée"), and the
+    the device itself (the entity whose `device_class` is `power`), and the
     switch-off targets the device, so renaming either entity cannot break the
     automation.
 
