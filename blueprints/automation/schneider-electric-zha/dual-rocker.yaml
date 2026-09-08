@@ -1,0 +1,240 @@
+blueprint:
+  name: "Schneider Electric ZHA — 2 rockers ON/OFF"
+  description: >
+    Controls two entities with the two rockers of a Schneider Electric Zigbee
+    wall switch paired through ZHA.
+
+
+    Supports both device families:
+
+    - AIRLINK / FLS (`FLS/AIRLINK/4`) — rockers emit OnOff commands
+      (cluster 6: `on` / `off`).
+
+    - Wiser shutter switch (`NHPB/SHUTTER/1`, `1GANG/SHUTTER/1`) — rockers emit
+      Window Covering commands (cluster 258: `up_open` / `down_close`).
+      `up_open` is treated as ON, `down_close` as OFF.
+
+
+    Attribute-update noise is ignored by requiring `args: []`.
+
+
+    Tags: schneider electric, zha
+  domain: automation
+  author: XIIIVI
+  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/dual-rocker.yaml
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    zha_device:
+      name: "Schneider Electric ZHA device"
+      description: "AIRLINK/FLS switch or Wiser shutter switch, paired through ZHA."
+      selector:
+        device:
+          filter:
+            - integration: zha
+              model: FLS/AIRLINK/4
+            - integration: zha
+              model: NHPB/SHUTTER/1
+            - integration: zha
+              model: 1GANG/SHUTTER/1
+
+    endpoint_rocker1:
+      name: "Endpoint rocker 1"
+      description: "ZHA endpoint of the first rocker (21 on both families)."
+      default: 21
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    entity_rocker1:
+      name: "Entity controlled by rocker 1"
+      selector:
+        entity:
+          domain: [light, switch, input_boolean]
+
+    endpoint_rocker2:
+      name: "Endpoint rocker 2"
+      description: "ZHA endpoint of the second rocker (22 on AIRLINK in 4-rocker mode)."
+      default: 22
+      selector:
+        number:
+          min: 1
+          max: 240
+          mode: box
+
+    entity_rocker2:
+      name: "Entity controlled by rocker 2"
+      selector:
+        entity:
+          domain: [light, switch, input_boolean]
+
+    installation:
+      name: "Installation"
+      icon: mdi:tag-multiple
+      collapsed: true
+      input:
+        install_area:
+          name: "Installation room"
+          description: >
+            Room the switch is installed in. Every entity of that room is
+            switched together with the entities selected above.
+          default: []
+          selector:
+            area:
+              multiple: true
+
+        install_labels:
+          name: "Labels"
+          description: >
+            One or more labels. Every entity carrying one of them is switched
+            together with the entities selected above.
+          default: []
+          selector:
+            label:
+              multiple: true
+
+        install_icon:
+          name: "Icon"
+          description: >
+            Icon representing this switch. Home Assistant cannot set an
+            automation icon from YAML, so this value is only exposed as the
+            `install_icon` variable (visible in traces and usable in templates);
+            set the real automation icon from the automation's overflow menu.
+          default: mdi:light-switch
+          selector:
+            icon:
+
+variables:
+  install_icon: !input install_icon
+
+triggers:
+  # Rocker 1 — ON (OnOff switch) / UP (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker1
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: r1_on
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker1
+      cluster_id: 258
+      command: up_open
+      args: []
+    id: r1_on
+
+  # Rocker 1 — OFF (OnOff switch) / DOWN (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker1
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: r1_off
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker1
+      cluster_id: 258
+      command: down_close
+      args: []
+    id: r1_off
+
+  # Rocker 2 — ON (OnOff switch) / UP (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker2
+      cluster_id: 6
+      command: "on"
+      args: []
+    id: r2_on
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker2
+      cluster_id: 258
+      command: up_open
+      args: []
+    id: r2_on
+
+  # Rocker 2 — OFF (OnOff switch) / DOWN (shutter switch)
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker2
+      cluster_id: 6
+      command: "off"
+      args: []
+    id: r2_off
+
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_id: !input zha_device
+      endpoint_id: !input endpoint_rocker2
+      cluster_id: 258
+      command: down_close
+      args: []
+    id: r2_off
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: r1_on
+        sequence:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: !input entity_rocker1
+              area_id: !input install_area
+              label_id: !input install_labels
+
+      - conditions:
+          - condition: trigger
+            id: r1_off
+        sequence:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: !input entity_rocker1
+              area_id: !input install_area
+              label_id: !input install_labels
+
+      - conditions:
+          - condition: trigger
+            id: r2_on
+        sequence:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: !input entity_rocker2
+              area_id: !input install_area
+              label_id: !input install_labels
+
+      - conditions:
+          - condition: trigger
+            id: r2_off
+        sequence:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: !input entity_rocker2
+              area_id: !input install_area
+              label_id: !input install_labels
+
+mode: queued
+max: 10
