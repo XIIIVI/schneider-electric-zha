@@ -53,6 +53,11 @@ args: []
 | `four-rockers.yaml` | Four independent actions from endpoints 21 and 22, up and down each. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Ffour-rockers.yaml) |
 | `socket-auto-off.yaml` | Switches a socket off once its power stays below a threshold long enough. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fsocket-auto-off.yaml) |
 
+`socket-auto-off.yaml` asks for the socket, a power threshold and a duration —
+nothing else. It resolves the socket's power sensor from the device itself with
+`device_entities()`, so there is no second entity input to keep in sync, and it
+never fires while that sensor reads `unavailable` or `unknown`.
+
 All four require **Home Assistant 2024.10.0** or newer (`triggers:` / `actions:`
 syntax and input sections).
 

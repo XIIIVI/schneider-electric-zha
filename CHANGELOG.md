@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `socket-auto-off.yaml` — switches a Schneider Electric Zigbee socket
   (`SOCKET/OUTLET/1`, `SOCKET/OUTLET/2`) off once its own power sensor stays
-  below a threshold for long enough. Threshold and duration are inputs
-  (20 W for 3 minutes by default) and the socket is turned off through its
-  device, so renaming the switch entity cannot break it.
+  below a threshold for long enough. The socket is the only entity input:
+  the power sensor is resolved from the device with `device_entities()` in the
+  trigger template, and the switch-off targets the device, so renaming either
+  entity cannot break it. Threshold and duration are inputs, 20 W for 3 minutes
+  by default. A reading of `unavailable` or `unknown` never switches the socket
+  off, and a socket exposing several power sensors waits for the highest of
+  them.
 - README: socket row in the supported-device table, import badge for the new
   blueprint, and a **Name, icon, area, labels and category** section explaining,
   with the Home Assistant source it comes from, why a blueprint cannot set any
