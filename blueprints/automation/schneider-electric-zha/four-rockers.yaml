@@ -20,10 +20,13 @@ blueprint:
     Attribute-update noise is ignored by requiring `args: []`.
 
 
-    The `install_area`, `install_labels` and `install_icon` variables are
-    available inside every action sequence, so an action can target the room or
-    the labels declared below, for example
-    `target: {area_id: "{{ install_area }}"}`.
+    The `extra_areas` and `extra_labels` variables are available inside every
+    action sequence, so an action can target the areas or the labels declared
+    below, for example `target: {area_id: "{{ extra_areas }}"}`.
+
+
+    Home Assistant's automation schema has no icon, label, area or category key,
+    so those are set on the automation itself once it exists — see the README.
 
 
     Tags: schneider electric, zha
@@ -86,46 +89,32 @@ blueprint:
       selector:
         action:
 
-    installation:
-      name: "Installation"
-      icon: mdi:tag-multiple
+    extra_targets:
+      name: "Additional targets"
+      icon: mdi:target
       collapsed: true
       input:
-        install_area:
-          name: "Installation room"
+        extra_areas:
+          name: "Additional areas"
           description: >
-            Room the switch is installed in, exposed to every action sequence as
-            the `install_area` variable.
+            Exposed to every action sequence as the `extra_areas` variable.
           default: []
           selector:
             area:
               multiple: true
 
-        install_labels:
-          name: "Labels"
+        extra_labels:
+          name: "Additional labels"
           description: >
-            One or more labels, exposed to every action sequence as the
-            `install_labels` variable.
+            Exposed to every action sequence as the `extra_labels` variable.
           default: []
           selector:
             label:
               multiple: true
 
-        install_icon:
-          name: "Icon"
-          description: >
-            Icon representing this switch. Home Assistant cannot set an
-            automation icon from YAML, so this value is only exposed as the
-            `install_icon` variable; set the real automation icon from the
-            automation's overflow menu.
-          default: mdi:light-switch
-          selector:
-            icon:
-
 variables:
-  install_area: !input install_area
-  install_labels: !input install_labels
-  install_icon: !input install_icon
+  extra_areas: !input extra_areas
+  extra_labels: !input extra_labels
 
 triggers:
   # Endpoint 1 — ON (OnOff switch) / UP (shutter switch)

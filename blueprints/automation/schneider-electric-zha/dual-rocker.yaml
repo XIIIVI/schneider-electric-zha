@@ -18,6 +18,10 @@ blueprint:
     Attribute-update noise is ignored by requiring `args: []`.
 
 
+    Home Assistant's automation schema has no icon, label, area or category key,
+    so those are set on the automation itself once it exists — see the README.
+
+
     Tags: schneider electric, zha
   domain: automation
   author: XIIIVI
@@ -70,44 +74,31 @@ blueprint:
         entity:
           domain: [light, switch, input_boolean]
 
-    installation:
-      name: "Installation"
-      icon: mdi:tag-multiple
+    extra_targets:
+      name: "Additional targets"
+      icon: mdi:target
       collapsed: true
       input:
-        install_area:
-          name: "Installation room"
+        extra_areas:
+          name: "Additional areas"
           description: >
-            Room the switch is installed in. Every entity of that room is
-            switched together with the entities selected above.
+            Every entity of these areas is switched together with the entities
+            selected above. Leave empty to switch only those entities.
           default: []
           selector:
             area:
               multiple: true
 
-        install_labels:
-          name: "Labels"
+        extra_labels:
+          name: "Additional labels"
           description: >
-            One or more labels. Every entity carrying one of them is switched
-            together with the entities selected above.
+            Every entity carrying one of these labels is switched together with
+            the entities selected above. Leave empty to switch only those
+            entities.
           default: []
           selector:
             label:
               multiple: true
-
-        install_icon:
-          name: "Icon"
-          description: >
-            Icon representing this switch. Home Assistant cannot set an
-            automation icon from YAML, so this value is only exposed as the
-            `install_icon` variable (visible in traces and usable in templates);
-            set the real automation icon from the automation's overflow menu.
-          default: mdi:light-switch
-          selector:
-            icon:
-
-variables:
-  install_icon: !input install_icon
 
 triggers:
   # Rocker 1 — ON (OnOff switch) / UP (shutter switch)
@@ -203,8 +194,8 @@ actions:
           - action: homeassistant.turn_on
             target:
               entity_id: !input entity_rocker1
-              area_id: !input install_area
-              label_id: !input install_labels
+              area_id: !input extra_areas
+              label_id: !input extra_labels
 
       - conditions:
           - condition: trigger
@@ -213,8 +204,8 @@ actions:
           - action: homeassistant.turn_off
             target:
               entity_id: !input entity_rocker1
-              area_id: !input install_area
-              label_id: !input install_labels
+              area_id: !input extra_areas
+              label_id: !input extra_labels
 
       - conditions:
           - condition: trigger
@@ -223,8 +214,8 @@ actions:
           - action: homeassistant.turn_on
             target:
               entity_id: !input entity_rocker2
-              area_id: !input install_area
-              label_id: !input install_labels
+              area_id: !input extra_areas
+              label_id: !input extra_labels
 
       - conditions:
           - condition: trigger
@@ -233,8 +224,8 @@ actions:
           - action: homeassistant.turn_off
             target:
               entity_id: !input entity_rocker2
-              area_id: !input install_area
-              label_id: !input install_labels
+              area_id: !input extra_areas
+              label_id: !input extra_labels
 
 mode: queued
 max: 10

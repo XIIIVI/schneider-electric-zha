@@ -11,15 +11,19 @@ Tags: `schneider electric`, `zha`
 |---|---|---|---|
 | Wiser AIRLINK / FLS switch | `FLS/AIRLINK/4` | `S520531`, `S920531` | OnOff cluster `6` — `on` / `off` |
 | Wiser shutter switch | `NHPB/SHUTTER/1`, `1GANG/SHUTTER/1` | `S520567`, `S520567W` and equivalents | Window Covering cluster `258` (`0x0102`) — `up_open` / `down_close` |
+| Zigbee socket | `SOCKET/OUTLET/1`, `SOCKET/OUTLET/2` | Wiser smart sockets and outlets | No rocker event — driven by the socket's own power sensor |
 
-The two families do **not** speak the same Zigbee cluster, so every blueprint
-listens to both. On a shutter switch, `up_open` is treated as **ON** and
+The two switch families do **not** speak the same Zigbee cluster, so every
+rocker blueprint listens to both. On a shutter switch, `up_open` is treated as **ON** and
 `down_close` as **OFF**.
 
 Every trigger requires `args: []` so the duplicated `attribute_updated` events
 some firmwares emit never fire the automation twice.
 
 ### ZHA event reference
+
+This applies to the rocker blueprints only — `socket-auto-off.yaml` never looks
+at a `zha_event`.
 
 Pressing a rocker fires a `zha_event`. Watch it live under
 **Developer tools → Events → listen to `zha_event`**:
@@ -47,31 +51,53 @@ args: []
 | `single-rocker.yaml` | One rocker, one action when pressed up and another when pressed down. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fsingle-rocker.yaml) |
 | `dual-rocker.yaml` | Two rockers control two entities (ON/OFF each). | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fdual-rocker.yaml) |
 | `four-rockers.yaml` | Four independent actions from endpoints 21 and 22, up and down each. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Ffour-rockers.yaml) |
+| `socket-auto-off.yaml` | Switches a socket off once its power stays below a threshold long enough. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fsocket-auto-off.yaml) |
 
-All three require **Home Assistant 2024.10.0** or newer (`triggers:` / `actions:`
+All four require **Home Assistant 2024.10.0** or newer (`triggers:` / `actions:`
 syntax and input sections).
 
-### Installation room, labels and icon
+### Additional targets
 
-Every blueprint ends with a collapsed **Installation** section asking for:
+Every blueprint ends with a collapsed **Additional targets** section asking for
+extra areas and extra labels. Both default to empty, and empty means "no extra
+target" — only the entities you selected change.
 
-- **Installation room** — one or more areas,
-- **Labels** — one or more labels,
-- **Icon**.
+In `dual-rocker.yaml` they are added to the `target:` of each ON/OFF action and
+in `socket-auto-off.yaml` to the `target:` of the switch-off, so the areas and
+the labels are switched along with the selected entities. In
+`single-rocker.yaml` and `four-rockers.yaml` the actions are yours, so the two
+values are exposed as the `extra_areas` and `extra_labels` variables instead —
+usable from your own action sequence, e.g.
+`target: {area_id: "{{ extra_areas }}"}`.
 
-In `dual-rocker.yaml` the room and the labels are added to the target of each
-ON/OFF action, so the whole room (and everything carrying those labels) is
-switched along with the two selected entities. Leave them empty to switch only
-those entities.
+### Name, icon, area, labels and category
 
-In `single-rocker.yaml` and `four-rockers.yaml` the actions are yours, so the
-three values are exposed as the `install_area`, `install_labels` and
-`install_icon` variables instead — usable from your own action sequence, e.g.
-`target: {area_id: "{{ install_area }}"}`.
+**A blueprint cannot set any of them.** This is a Home Assistant limit, not an
+omission:
 
-The icon is informational: Home Assistant has no `icon` key in an automation's
-YAML configuration, so set the real automation icon from the automation's
-overflow menu after creating it.
+- [`components/automation/config.py`](https://github.com/home-assistant/core/blob/dev/homeassistant/components/automation/config.py)
+  builds its schema with `script.make_script_schema(..., extra=vol.PREVENT_EXTRA)`
+  and accepts only `id`, `alias`, `description`, `trace`, `initial_state`,
+  `triggers`, `conditions`, `variables`, `trigger_variables`, `actions`, `mode`,
+  `max` and `max_exceeded`. An `icon:`, `labels:`, `area:` or `category:` key in
+  an automation is a **validation error**, not an ignored key. Those four live in
+  the entity registry, the label registry and the category registry, written by
+  the WebSocket API — that is, by the UI.
+- `alias` (the name) *is* accepted, but
+  [`components/blueprint/models.py`](https://github.com/home-assistant/core/blob/dev/homeassistant/components/blueprint/models.py)
+  merges with `combined = {**processed, **self.config_with_inputs}`: the
+  automation entry's own `alias` overrides anything the blueprint provides, and
+  the UI always writes one.
+
+So set them on the automation once, right after creating it:
+
+| What | Where |
+|---|---|
+| **Name** | Asked in the save dialog, pre-filled with the blueprint name. Rename later with the ⋮ menu → **Rename**. |
+| **Icon** | ⋮ menu → **Rename** → icon picker next to the name field. |
+| **Area** | ⋮ menu → **Move to area**. |
+| **Labels** | ⋮ menu → **Add label**, or select several automations in the list and label them at once. |
+| **Category** | ⋮ menu → **Move to category**. |
 
 ## Installation
 

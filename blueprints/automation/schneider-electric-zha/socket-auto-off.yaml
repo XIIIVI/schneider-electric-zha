@@ -1,0 +1,112 @@
+blueprint:
+  name: "Schneider Electric ZHA — socket auto-off on low power"
+  description: >
+    Switches a Schneider Electric Zigbee socket off once the appliance plugged
+    into it has been drawing less than a given power for long enough — a PC that
+    went to sleep, a charger that finished, an EV cable left plugged in.
+
+
+    Works with any socket reporting `SOCKET/OUTLET/1` or `SOCKET/OUTLET/2`
+    through ZHA. The trigger reads the socket's own power sensor, so it needs no
+    extra hardware.
+
+
+    The socket is turned off through the device, not through a hard-coded entity,
+    so the automation survives an entity being renamed.
+
+
+    Home Assistant's automation schema has no icon, label, area or category key,
+    so those are set on the automation itself once it exists — see the README.
+
+
+    Tags: schneider electric, zha
+  domain: automation
+  author: XIIIVI
+  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/socket-auto-off.yaml
+  homeassistant:
+    min_version: 2024.10.0
+  input:
+    socket_device:
+      name: "Schneider Electric socket"
+      description: "Zigbee socket paired through ZHA. Every switch it exposes is turned off."
+      selector:
+        device:
+          filter:
+            - integration: zha
+              model: SOCKET/OUTLET/1
+            - integration: zha
+              model: SOCKET/OUTLET/2
+
+    power_sensor:
+      name: "Power sensor of that socket"
+      description: >
+        The socket's own power sensor. Pick the one belonging to the device
+        selected above — that is what the threshold is measured on.
+      selector:
+        entity:
+          filter:
+            - integration: zha
+              domain: sensor
+              device_class: power
+
+    power_threshold:
+      name: "Power threshold"
+      description: "The socket is switched off once the measured power stays strictly below this value."
+      default: 20
+      selector:
+        number:
+          min: 0
+          max: 3680
+          step: 1
+          unit_of_measurement: W
+          mode: box
+
+    below_for:
+      name: "For how long"
+      description: "How long the power must stay below the threshold before switching off."
+      default:
+        hours: 0
+        minutes: 3
+        seconds: 0
+      selector:
+        duration:
+
+    extra_targets:
+      name: "Additional targets"
+      icon: mdi:target
+      collapsed: true
+      input:
+        extra_areas:
+          name: "Additional areas"
+          description: >
+            Every entity of these areas is switched off together with the socket.
+            Leave empty to switch off only the socket.
+          default: []
+          selector:
+            area:
+              multiple: true
+
+        extra_labels:
+          name: "Additional labels"
+          description: >
+            Every entity carrying one of these labels is switched off together
+            with the socket. Leave empty to switch off only the socket.
+          default: []
+          selector:
+            label:
+              multiple: true
+
+triggers:
+  - trigger: numeric_state
+    entity_id: !input power_sensor
+    below: !input power_threshold
+    for: !input below_for
+
+actions:
+  - action: homeassistant.turn_off
+    target:
+      device_id: !input socket_device
+      area_id: !input extra_areas
+      label_id: !input extra_labels
+
+mode: single

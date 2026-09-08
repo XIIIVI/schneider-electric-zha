@@ -5,6 +5,37 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-09-08
+
+### Added
+
+- `socket-auto-off.yaml` — switches a Schneider Electric Zigbee socket
+  (`SOCKET/OUTLET/1`, `SOCKET/OUTLET/2`) off once its own power sensor stays
+  below a threshold for long enough. Threshold and duration are inputs
+  (20 W for 3 minutes by default) and the socket is turned off through its
+  device, so renaming the switch entity cannot break it.
+- README: socket row in the supported-device table, import badge for the new
+  blueprint, and a **Name, icon, area, labels and category** section explaining,
+  with the Home Assistant source it comes from, why a blueprint cannot set any
+  of them and where to set them instead.
+
+### Changed
+
+- **Breaking**: `install_area` and `install_labels` are renamed `extra_areas`
+  and `extra_labels`, and the **Installation** section is renamed
+  **Additional targets**. They never carried automation metadata — they add
+  targets to the actions — and the old names said otherwise. Automations created
+  from 2.0.0 must be recreated.
+
+### Removed
+
+- **Breaking**: the `install_icon` input. Home Assistant's automation schema is
+  built with `script.make_script_schema(..., extra=vol.PREVENT_EXTRA)` and has no
+  `icon`, `labels`, `area` or `category` key, so no blueprint can set them; the
+  input only ever fed a variable nothing read. `alias` is accepted by the schema
+  but `{**processed, **self.config_with_inputs}` in the blueprint model lets the
+  automation entry's own name win, so a blueprint cannot set the name either.
+
 ## [2.0.0] - 2026-09-08
 
 ### Added
@@ -63,5 +94,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wall switches (`S520531`, `S920531`): single rocker, dual rocker and
   four rockers, plus the project README.
 
+[3.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v3.0.0
 [2.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v2.0.0
 [1.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v1.0.0
