@@ -48,9 +48,9 @@ args: []
 
 | Blueprint | What it does | Import |
 |---|---|---|
-| `single-rocker.yaml` | One rocker, one action when pressed up and another when pressed down. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fsingle-rocker.yaml) |
+| `two-functions.yaml` | One endpoint, two functions: one action when pressed up, one when pressed down. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Ftwo-functions.yaml) |
 | `dual-rocker.yaml` | Two rockers control two entities (ON/OFF each). | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fdual-rocker.yaml) |
-| `four-rockers.yaml` | Four independent actions from endpoints 21 and 22, up and down each. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Ffour-rockers.yaml) |
+| `four-functions.yaml` | Two endpoints, four functions: one action per up/down press of each. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Ffour-functions.yaml) |
 | `socket-auto-off.yaml` | Switches a socket off once its power stays below a threshold long enough. | [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FXIIIVI%2Fschneider-electric-zha%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschneider-electric-zha%2Fsocket-auto-off.yaml) |
 
 `socket-auto-off.yaml` asks for the socket, a power threshold and a duration —
@@ -70,7 +70,7 @@ target" — only the entities you selected change.
 In `dual-rocker.yaml` they are added to the `target:` of each ON/OFF action and
 in `socket-auto-off.yaml` to the `target:` of the switch-off, so the areas and
 the labels are switched along with the selected entities. In
-`single-rocker.yaml` and `four-rockers.yaml` the actions are yours, so the two
+`two-functions.yaml` and `four-functions.yaml` the actions are yours, so the two
 values are exposed as the `extra_areas` and `extra_labels` variables instead —
 usable from your own action sequence, e.g.
 `target: {area_id: "{{ extra_areas }}"}`.
@@ -132,9 +132,9 @@ GitHub URL of the blueprint. Home Assistant records the URL as `source_url`, so
 - Press and hold **buttons 2 and 3 for 10 seconds**.
 - Success is confirmed by the **red LED**.
 
-Endpoint 22 then emits its own `on` / `off` events and `four-rockers.yaml`
+Endpoint 22 then emits its own `on` / `off` events and `four-functions.yaml`
 becomes usable. Shutter switches have a single rocker endpoint (21), so only the
-first pair of actions of `four-rockers.yaml` ever fires on them.
+first pair of actions of `four-functions.yaml` ever fires on them.
 
 ## Factory reset
 
