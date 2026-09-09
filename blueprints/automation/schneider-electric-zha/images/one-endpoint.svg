@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" font-family="Verdana, Arial, sans-serif">
+  <title>One ZHA endpoint, two functions</title>
+  <rect width="760" height="300" fill="#f4f4f5"/>
+  <text x="380" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2933">One endpoint, two functions</text>
+
+  <!-- AIRLINK / FLS 1-gang paddle, drawn from the official Exxact user guide's device photo (WDE002906) -->
+  <g transform="translate(70,55)">
+    <text x="90" y="0" text-anchor="middle" font-size="13" fill="#52606d">AIRLINK / FLS switch</text>
+    <rect x="55" y="8" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="55" y="150" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="109" y="8" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="109" y="150" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="20" y="20" width="140" height="150" rx="10" fill="#ffffff" stroke="#cbd2d9" stroke-width="2"/>
+    <line x1="20" y1="95" x2="160" y2="95" stroke="#e4e7eb" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <circle cx="90" cy="95" r="4" fill="#9aa5b1"/>
+    <path d="M 90 55 l -10 14 h 20 z" fill="#7b8794"/>
+    <path d="M 90 135 l -10 -14 h 20 z" fill="#7b8794"/>
+    <text x="90" y="195" text-anchor="middle" font-size="12" fill="#334e68">endpoint 21</text>
+  </g>
+  <g transform="translate(70,55)" font-size="12" fill="#334e68">
+    <text x="180" y="60">▲ up → cluster 6 "on"</text>
+    <text x="180" y="140">▼ down → cluster 6 "off"</text>
+  </g>
+
+  <!-- Wiser shutter switch, round paddle, drawn from the official Odace blind-control-switch user guide (S920567) -->
+  <g transform="translate(460,55)">
+    <text x="90" y="0" text-anchor="middle" font-size="13" fill="#52606d">Wiser shutter switch</text>
+    <rect x="55" y="8" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="55" y="150" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="109" y="8" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="109" y="150" width="16" height="26" rx="3" fill="#3e4c59"/>
+    <rect x="20" y="20" width="140" height="150" rx="10" fill="#f4f4f5"/>
+    <circle cx="90" cy="95" r="62" fill="#ffffff" stroke="#cbd2d9" stroke-width="2"/>
+    <circle cx="90" cy="95" r="4" fill="#9aa5b1"/>
+    <path d="M 90 55 l -10 14 h 20 z" fill="#7b8794"/>
+    <path d="M 90 135 l -10 -14 h 20 z" fill="#7b8794"/>
+    <text x="90" y="195" text-anchor="middle" font-size="12" fill="#334e68">endpoint 21</text>
+  </g>
+  <g transform="translate(460,55)" font-size="12" fill="#334e68">
+    <text x="180" y="60">▲ up_open → cluster 258</text>
+    <text x="180" y="140">▼ down_close → cluster 258</text>
+  </g>
+
+  <text x="380" y="285" text-anchor="middle" font-size="11" fill="#7b8794">Original schematic, redrawn from Schneider Electric's own device user guides — not the manufacturer's photo.</text>
+</svg>

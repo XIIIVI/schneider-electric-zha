@@ -5,6 +5,29 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-09-09
+
+### Added
+
+- Rocker position diagrams: `images/one-endpoint.svg`, `images/two-endpoints.svg`
+  and `images/socket-outlet.svg`, embedded in the description of
+  `two-functions.yaml`, `four-functions.yaml` + `dual-rocker.yaml`, and
+  `socket-auto-off.yaml` respectively. Home Assistant renders both a blueprint's
+  own description and each input's description as Markdown (`ha-markdown` in
+  the frontend), so the diagram shows inline in the blueprint import screen and
+  the "Use Blueprint" automation editor — confirmed by reading that rendering
+  code rather than assumed. Also added to the README, referenced by relative
+  path there and by `raw.githubusercontent.com` URL inside the blueprints
+  (an installation's browser needs GitHub to be reachable to display them; the
+  blueprint itself is unaffected if it is not).
+- These are original schematics, not the manufacturer's photos: proportions and
+  button layout were checked against Schneider Electric's own device user
+  guides — the Exxact/AIRLINK 1-gang and 2-gang wireless switch (`WDE002906`,
+  `WDE002924`) and the Odace connected blind-control switch (`S920567`) — and
+  redrawn from scratch. The AIRLINK 1-gang paddle and the shutter switch's round
+  button turned out to be different physical shapes, which is why
+  `two-functions.yaml` shows both rather than picking one.
+
 ## [5.0.0] - 2026-09-09
 
 ### Changed
@@ -126,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wall switches (`S520531`, `S920531`): single rocker, dual rocker and
   four rockers, plus the project README.
 
+[5.1.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v5.1.0
 [5.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v5.0.0
 [4.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v4.0.0
 [3.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v3.0.0

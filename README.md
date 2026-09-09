@@ -61,6 +61,28 @@ never fires while that sensor reads `unavailable` or `unknown`.
 All four require **Home Assistant 2024.10.0** or newer (`triggers:` / `actions:`
 syntax and input sections).
 
+### Rocker position diagrams
+
+Each blueprint's description embeds a small diagram showing where its inputs
+map on the physical device — which rocker is endpoint 21 vs 22, up vs down,
+or that a socket has no rocker at all. They render inline in Home Assistant's
+blueprint import screen and the "Use Blueprint" automation editor, since both
+render the description as Markdown.
+
+| | |
+|---|---|
+| `two-functions.yaml` | ![One endpoint, two functions](blueprints/automation/schneider-electric-zha/images/one-endpoint.svg) |
+| `four-functions.yaml`, `dual-rocker.yaml` | ![Two endpoints, one rocker pair each](blueprints/automation/schneider-electric-zha/images/two-endpoints.svg) |
+| `socket-auto-off.yaml` | ![Zigbee socket, no rocker](blueprints/automation/schneider-electric-zha/images/socket-outlet.svg) |
+
+These are original schematics — proportions and button layout checked against
+Schneider Electric's own device user guides for the AIRLINK/FLS switch, the
+Wiser shutter switch and the Zigbee socket, redrawn from scratch rather than
+copied from their photos. The blueprints reference them from
+`raw.githubusercontent.com`, so they need the viewer's browser to reach GitHub;
+a fully offline installation shows broken-image icons instead, without
+affecting anything the blueprint does.
+
 ### Additional targets
 
 Every blueprint ends with a collapsed **Additional targets** section asking for

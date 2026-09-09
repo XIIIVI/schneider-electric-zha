@@ -6,6 +6,9 @@ blueprint:
     it is pressed down.
 
 
+    ![One endpoint, two functions: AIRLINK/FLS rectangular paddle vs Wiser round shutter switch, up/down mapped to on/off](https://raw.githubusercontent.com/XIIIVI/schneider-electric-zha/main/blueprints/automation/schneider-electric-zha/images/one-endpoint.svg)
+
+
     For a device exposing two endpoints (2 rocker pairs, 4 functions), see
     `four-functions.yaml` instead.
 
