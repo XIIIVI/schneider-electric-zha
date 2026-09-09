@@ -1,8 +1,13 @@
 blueprint:
-  name: "Schneider Electric ZHA — single rocker"
+  name: "Schneider Electric ZHA — 2 functions (1 endpoint × up/down)"
   description: >
-    Runs one action when a rocker of a Schneider Electric Zigbee wall switch is
-    pressed up, and another one when it is pressed down.
+    Runs two independent actions from the one endpoint of a Schneider Electric
+    Zigbee wall switch paired through ZHA — one when it is pressed up, one when
+    it is pressed down.
+
+
+    For a device exposing two endpoints (2 rocker pairs, 4 functions), see
+    `four-functions.yaml` instead.
 
 
     Supports both device families:
@@ -30,7 +35,7 @@ blueprint:
     Tags: schneider electric, zha
   domain: automation
   author: XIIIVI
-  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/single-rocker.yaml
+  source_url: https://github.com/XIIIVI/schneider-electric-zha/blob/main/blueprints/automation/schneider-electric-zha/two-functions.yaml
   homeassistant:
     min_version: 2024.10.0
   input:

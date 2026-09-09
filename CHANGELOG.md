@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-09-09
+
+### Changed
+
+- **Breaking**: `single-rocker.yaml` and `four-rockers.yaml` are renamed
+  `two-functions.yaml` and `four-functions.yaml`. Both blueprints assign an
+  independent action to each up/down press rather than to an entity, and
+  "rocker" was counting physical paddles while the number that actually varies
+  is how many such presses (functions) the blueprint exposes — one endpoint
+  gives 2, two endpoints give 4. Each blueprint's description now links to the
+  other. Home Assistant resolves an installed automation's blueprint by file
+  path, so **every automation created from either blueprint must be recreated**
+  after updating.
+
 ## [4.0.0] - 2026-09-08
 
 ### Changed
@@ -112,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wall switches (`S520531`, `S920531`): single rocker, dual rocker and
   four rockers, plus the project README.
 
+[5.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v5.0.0
 [4.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v4.0.0
 [3.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v3.0.0
 [2.0.0]: https://github.com/XIIIVI/schneider-electric-zha/releases/tag/v2.0.0
