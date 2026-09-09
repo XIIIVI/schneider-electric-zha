@@ -6,6 +6,9 @@ blueprint:
     went to sleep, a charger that finished, an EV cable left plugged in.
 
 
+    ![Schneider Electric Zigbee socket, no rocker](https://raw.githubusercontent.com/XIIIVI/schneider-electric-zha/main/blueprints/automation/schneider-electric-zha/images/socket-outlet.svg)
+
+
     Works with any socket reporting `SOCKET/OUTLET/1` or `SOCKET/OUTLET/2`
     through ZHA. Pick the socket and nothing else: the power sensor is found on
     the device itself (the entity whose `device_class` is `power`), and the

@@ -6,6 +6,9 @@ blueprint:
     command, giving four distinct rocker cases.
 
 
+    ![AIRLINK/FLS switch in 2-gang mode: one plate, two independent rockers, endpoint 21 left / 22 right](https://raw.githubusercontent.com/XIIIVI/schneider-electric-zha/main/blueprints/automation/schneider-electric-zha/images/two-endpoints.svg)
+
+
     For a device exposing a single endpoint (1 rocker, 2 functions), see
     `two-functions.yaml` instead.
 

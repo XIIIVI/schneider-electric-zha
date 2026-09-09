@@ -5,6 +5,9 @@ blueprint:
     wall switch paired through ZHA.
 
 
+    ![AIRLINK/FLS switch in 2-gang mode: one plate, two independent rockers, endpoint 21 left / 22 right](https://raw.githubusercontent.com/XIIIVI/schneider-electric-zha/main/blueprints/automation/schneider-electric-zha/images/two-endpoints.svg)
+
+
     Supports both device families:
 
     - AIRLINK / FLS (`FLS/AIRLINK/4`) — rockers emit OnOff commands
